@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자재 수량 계산기</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', Arial, sans-serif;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 50%, #5d8a66 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calculator-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .calculator-title {
+            text-align: center;
+            color: #333;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #2d5016, #4a7c59);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #4a7c59;
+            box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
+            transform: translateY(-1px);
+        }
+
+        select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 40px;
+            appearance: none;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(74, 124, 89, 0.3);
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 124, 89, 0.4);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3);
+        }
+
+        .result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result-number {
+            font-size: 36px;
+            font-weight: 800;
+            margin: 10px 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .unit-label {
+            font-size: 12px;
+            color: #777;
+            margin-left: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .calculator-container {
+                padding: 25px;
+                margin: 10px;
+            }
+            
+            .calculator-title {
+                font-size: 24px;
+            }
+            
+            .input-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 20px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <h1 class="calculator-title">자재 수량 계산기</h1>
+        
+        <form id="calculatorForm">
+            <div class="form-group">
+                <label for="material">자재 선택</label>
+                <select id="material" required>
+                    <option value="">자재를 선택하세요</option>
+                    <option value="20kg_gravel">20kg 자갈</option>
+                    <option value="18kg_gravel">18kg 자갈</option>
+                    <option value="15kg_gravel">15kg 자갈</option>
+                    <option value="15kg_volcanic">15kg 화산송이석</option>
+                    <option value="18kg_masato">18kg 마사토</option>
+                    <option value="18kg_fine_sand">18kg 친모래</option>
+                    <option value="18kg_river_sand">18kg 강모래</option>
+                    <option value="18kg_clay_soil">18kg 황토흙</option>
+                    <option value="20kg_washed_masato">20kg 세척마사토</option>
+                    <option value="52l_bark">52L 생바크</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>시공 면적 및 두께</label>
+                <div class="input-row">
+                    <div>
+                        <input type="number" id="width" placeholder="가로" step="0.1" min="0" required>
+                        <span class="unit-label">m</span>
+                    </div>
+                    <div>
+                        <input type="number" id="length" placeholder="세로" step="0.1" min="0" required>
+                        <span class="unit-label">m</span>
+                    </div>
+                    <div>
+                        <input type="number" id="thickness" placeholder="두께" step="0.1" min="0" required>
+                        <span class="unit-label">cm</span>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="calculate-btn">계산하기</button>
+        </form>
+
+        <div id="result" class="result">
+            <div>필요한 자재량</div>
+            <div class="result-number" id="resultNumber">0</div>
+            <div id="resultUnit">포대</div>
+        </div>
+
+        <div class="info-text">
+            정확한 시공을 위해 계산된 수량의,<br>
+            5-10% 여유분을 준비하시는 것을 권장합니다.
+        </div>
+    </div>
+
+    <script>
+        // 자재별 계수 정의 (1m² × 1cm당 필요 포대/L)
+        const materialRates = {
+            '20kg_gravel': { rate: 1.0, unit: '포대' },
+            '18kg_gravel': { rate: 1.2, unit: '포대' },
+            '15kg_gravel': { rate: 1.5, unit: '포대' },
+            '15kg_volcanic': { rate: 1.5, unit: '포대' },
+            '18kg_masato': { rate: 1.2, unit: '포대' },
+            '18kg_fine_sand': { rate: 1.2, unit: '포대' },
+            '18kg_river_sand': { rate: 1.2, unit: '포대' },
+            '18kg_clay_soil': { rate: 1.2, unit: '포대' },
+            '20kg_washed_masato': { rate: 1.0, unit: '포대' },
+            '52l_bark': { rate: 0.5, unit: 'L' }
+        };
+
+        document.getElementById('calculatorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const material = document.getElementById('material').value;
+            const width = parseFloat(document.getElementById('width').value);
+            const length = parseFloat(document.getElementById('length').value);
+            const thickness = parseFloat(document.getElementById('thickness').value);
+            
+            if (!material || !width || !length || !thickness) {
+                alert('모든 항목을 입력해주세요.');
+                return;
+            }
+            
+            // 계산: 면적(m²) × 두께(cm) × 자재별 계수
+            const area = width * length;
+            const volume = area * thickness;
+            const materialInfo = materialRates[material];
+            const result = Math.round(volume * materialInfo.rate);
+            
+            // 결과 표시
+            document.getElementById('resultNumber').textContent = result;
+            document.getElementById('resultUnit').textContent = materialInfo.unit;
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.classList.add('show');
+            
+            // 결과로 스크롤
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+
+        // 입력 필드 변경 시 결과 숨기기
+        ['material', 'width', 'length', 'thickness'].forEach(id => {
+            document.getElementById(id).addEventListener('input', function() {
+                document.getElementById('result').classList.remove('show');
+            });
+        });
+    </script>
+</body>
+</html>
